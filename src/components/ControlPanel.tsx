@@ -12,83 +12,50 @@ interface ControlPanelProps {
 
 export const ControlPanel = ({ status, onModeChange, onDisableAlarm, isConnected }: ControlPanelProps) => {
   const getModeButtonVariant = (mode: ArduinoStatus['modo']) => {
-    if (status.modo === mode) {
-      switch (mode) {
-        case 'vigilante':
-          return 'destructive'; // Red for vigilante mode
-        case 'alerta':
-          return 'default'; // Primary for alert mode
-        case 'programado':
-          return 'secondary'; // Secondary for scheduled mode
-        default:
-          return 'outline'; // Outline for disabled
-      }
-    }
-    return 'outline';
+    return status.modo === mode ? 'default' : 'outline';
   };
 
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle className="text-lg">Controles</CardTitle>
+        <CardTitle className="text-lg">Controles do Sistema</CardTitle>
       </CardHeader>
       
       <CardContent className="space-y-6">
-        {/* Mode Controls */}
+        {/* Modo de Operação */}
         <div className="space-y-3">
           <label className="text-sm font-medium text-muted-foreground">Modo de Operação</label>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <Button
-              variant={getModeButtonVariant('desativado')}
-              onClick={() => onModeChange('desativado')}
+              variant={getModeButtonVariant('desligado')}
+              onClick={() => onModeChange('desligado')}
               disabled={!isConnected}
-              className={cn(
-                "w-full",
-                status.modo === 'desativado' && "bg-muted text-muted-foreground"
-              )}
+              className={cn("w-full")}
             >
-              ⏸️ Desativado
+              ⏸️ Desligado
             </Button>
             
             <Button
-              variant={getModeButtonVariant('alerta')}
-              onClick={() => onModeChange('alerta')}
+              variant={getModeButtonVariant('casa')}
+              onClick={() => onModeChange('casa')}
               disabled={!isConnected}
-              className={cn(
-                "w-full",
-                status.modo === 'alerta' && "bg-status-auto text-status-auto-foreground hover:bg-status-auto/90"
-              )}
+              className={cn("w-full")}
             >
-              🔔 Alerta
+              🏠 Casa
             </Button>
             
             <Button
-              variant={getModeButtonVariant('vigilante')}
-              onClick={() => onModeChange('vigilante')}
+              variant={getModeButtonVariant('alarme')}
+              onClick={() => onModeChange('alarme')}
               disabled={!isConnected}
-              className={cn(
-                "w-full",
-                status.modo === 'vigilante' && "bg-status-alert text-status-alert-foreground hover:bg-status-alert/90"
-              )}
+              className={cn("w-full")}
             >
-              👁️ Vigilante
-            </Button>
-            
-            <Button
-              variant={getModeButtonVariant('programado')}
-              onClick={() => onModeChange('programado')}
-              disabled={!isConnected}
-              className={cn(
-                "w-full",
-                status.modo === 'programado' && "bg-status-warning text-status-warning-foreground hover:bg-status-warning/90"
-              )}
-            >
-              ⏰ Programado
+              🔔 Alarme
             </Button>
           </div>
         </div>
         
-        {/* Alarm Control */}
+        {/* Controle do Alarme */}
         {status.alarme && (
           <div className="space-y-3">
             <label className="text-sm font-medium text-muted-foreground">Controle de Alarme</label>
@@ -96,17 +63,17 @@ export const ControlPanel = ({ status, onModeChange, onDisableAlarm, isConnected
               variant="destructive"
               onClick={onDisableAlarm}
               disabled={!isConnected}
-              className="w-full bg-status-alert text-status-alert-foreground hover:bg-status-alert/90"
+              className="w-full"
             >
               🔇 Desativar Alarme
             </Button>
           </div>
         )}
         
-        {/* Connection Status */}
+        {/* Status de Conexão */}
         {!isConnected && (
-          <div className="p-3 bg-status-alert/10 border-l-4 border-status-alert rounded">
-            <p className="text-sm text-status-alert font-medium">
+          <div className="p-3 bg-red-100 border-l-4 border-red-500 rounded">
+            <p className="text-sm text-red-700 font-medium">
               ⚠️ Sistema desconectado - Controles indisponíveis
             </p>
           </div>

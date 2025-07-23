@@ -10,75 +10,57 @@ interface HeaderProps {
 
 export const Header = ({ status, isConnected, onRefresh }: HeaderProps) => {
   const getSystemStatusColor = () => {
-    if (!isConnected) return 'text-status-alert';
-    if (status.alarme) return 'text-status-alert';
-    if (status.modo === 'vigilante') return 'text-status-alert';
-    if (status.modo === 'alerta') return 'text-status-auto';
-    if (status.modo === 'programado') return 'text-status-warning';
-    return 'text-muted-foreground';
+    if (!isConnected) return 'text-red-500';
+    if (status.alarme) return 'text-red-600 font-bold';
+    if (status.modo === 'alarme') return 'text-orange-500';
+    if (status.modo === 'casa') return 'text-green-600';
+    return 'text-gray-500';
   };
 
   const getSystemStatusText = () => {
     if (!isConnected) return 'Sistema Desconectado';
-    if (status.alarme) return 'Alarme Ativo';
-    if (status.modo === 'vigilante') return 'Modo Vigilante Ativo';
-    if (status.modo === 'alerta') return 'Modo Alerta';
-    if (status.modo === 'programado') return 'Modo Programado';
-    return 'Sistema Desativado';
+    if (status.alarme) return '🚨 Alarme Ativo!';
+    if (status.modo === 'alarme') return 'Modo Alarme';
+    if (status.modo === 'casa') return 'Modo Casa';
+    return 'Sistema Desligado';
   };
 
   return (
-    <header className="w-full bg-card border-b border-border">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-bold">
-                A
-              </div>
-              <h1 className="text-2xl font-bold">Monitor Arduino</h1>
-            </div>
-            
-            <div className="hidden md:flex items-center gap-2">
-              <div className={cn(
-                "w-3 h-3 rounded-full",
-                isConnected ? "bg-status-normal animate-pulse" : "bg-status-alert animate-pulse"
-              )} />
-              <span className={cn("font-medium", getSystemStatusColor())}>
-                {getSystemStatusText()}
-              </span>
-            </div>
+    <header className="w-full bg-white border-b border-gray-200 shadow-sm">
+      <div className="container mx-auto px-4 py-4 flex flex-col md:flex-row md:items-center md:justify-between">
+        {/* Logo + Título */}
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold">
+            A
           </div>
-          
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onRefresh}
-              disabled={!isConnected}
-              className="hidden sm:flex"
-            >
-              🔄 Atualizar
-            </Button>
-            
-            {/* Mobile status indicator */}
-            <div className="md:hidden flex items-center gap-2">
-              <div className={cn(
-                "w-2 h-2 rounded-full",
-                isConnected ? "bg-status-normal" : "bg-status-alert"
-              )} />
-              <span className="text-sm text-muted-foreground">
-                {isConnected ? 'ON' : 'OFF'}
-              </span>
-            </div>
-          </div>
+          <h1 className="text-xl font-semibold">Monitor Arduino</h1>
         </div>
-        
-        {/* Mobile status text */}
-        <div className="md:hidden mt-2">
-          <span className={cn("text-sm font-medium", getSystemStatusColor())}>
-            {getSystemStatusText()}
-          </span>
+
+        {/* Status e Botão */}
+        <div className="mt-3 md:mt-0 flex items-center gap-4">
+          {/* Status visual */}
+          <div className="flex items-center gap-2">
+            <div
+              className={cn(
+                'w-3 h-3 rounded-full',
+                isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500 animate-pulse'
+              )}
+            />
+            <span className={cn('text-sm font-medium', getSystemStatusColor())}>
+              {getSystemStatusText()}
+            </span>
+          </div>
+
+          {/* Botão atualizar */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onRefresh}
+            disabled={!isConnected}
+            className="hidden sm:inline-flex"
+          >
+            🔄 Atualizar
+          </Button>
         </div>
       </div>
     </header>
