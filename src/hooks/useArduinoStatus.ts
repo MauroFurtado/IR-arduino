@@ -38,50 +38,40 @@ export const useArduinoStatus = () => {
     setLogs(prev => [newLog, ...prev.slice(0, 19)]);
   }, []);
 
- const fetchStatus = useCallback(async () => {
-  try {
-    const response = await fetch('http://localhost:3001/api/status');
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+  const fetchStatus = useCallback(async () => {
+    try {
+      const response = await fetch('http://localhost:3001/api/status');
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const data: ArduinoStatus = await response.json();
 
-    const data: ArduinoStatus = await response.json();
-
-    // Só gera log se houve mudança real
-    if (status.alarme !== data.alarme) {
-      if (data.alarme) {
+      if (status.alarme !== data.alarme && data.alarme) {
         addLog('Alarme disparado!', 'error');
         toast({
           title: "⚠️ Alarme Ativado",
-          description: "Movimento detectado em modo alarme!",
+          description: "Movimento detectado e alarme disparou!",
           variant: "destructive"
         });
-      } else {
-        addLog('Alarme desativado', 'info');
+      }
+
+      if (status.presenca !== data.presenca) {
+        addLog(data.presenca ? 'Presença detectada' : 'Área livre', data.presenca ? 'success' : 'warning');
+      }
+
+      if (status.modo !== data.modo) {
+        addLog(`Modo alterado para: ${data.modo}`, 'info');
+      }
+
+      setStatus(data);
+      setIsConnected(true);
+      setLastUpdate(new Date());
+    } catch (error) {
+      console.error('Erro ao buscar status:', error);
+      setIsConnected(false);
+      if (error instanceof Error) {
+        addLog(`Erro de conexão: ${error.message}`, 'error');
       }
     }
-
-    if (status.presenca !== data.presenca) {
-      addLog(
-        data.presenca ? 'Presença detectada' : 'Área livre',
-        data.presenca ? 'success' : 'warning'
-      );
-    }
-
-    if (status.modo !== data.modo) {
-      addLog(`Modo alterado para: ${data.modo}`, 'info');
-    }
-
-    setStatus(data);
-    setIsConnected(true);
-    setLastUpdate(new Date());
-  } catch (error) {
-    console.error('Erro ao buscar status:', error);
-    setIsConnected(false);
-    if (error instanceof Error) {
-      addLog(`Erro de conexão: ${error.message}`, 'error');
-    }
-  }
-}, [status, addLog, toast]);
-
+  }, [status, addLog, toast]);
 
   const changeMode = useCallback(async (newMode: ArduinoStatus['modo']) => {
     try {
