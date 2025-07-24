@@ -57,7 +57,7 @@ export const LogPanel = ({ logs }: LogPanelProps) => {
                   <div className="text-lg">
                     {getLogIcon(log.type)}
                   </div>
-                  
+
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">
                       {log.message}
@@ -66,7 +66,7 @@ export const LogPanel = ({ logs }: LogPanelProps) => {
                       {log.timestamp}
                     </p>
                   </div>
-                  
+
                   <Badge className={cn("text-xs", getLogTypeColor(log.type))}>
                     {log.type}
                   </Badge>

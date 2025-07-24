@@ -38,45 +38,51 @@ export const useArduinoStatus = () => {
     setLogs(prev => [newLog, ...prev.slice(0, 19)]);
   }, []);
 
-  // ✅ Buscar status do Node.js (Arduino via Serial)
-  const fetchStatus = useCallback(async () => {
-    try {
-      const response = await fetch('http://localhost:3001/api/status'); // Mock API
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+ const fetchStatus = useCallback(async () => {
+  try {
+    const response = await fetch('http://localhost:3001/api/status');
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-      const data: ArduinoStatus = await response.json();
+    const data: ArduinoStatus = await response.json();
 
-      // Detectar mudanças importantes
-      if (status.alarme !== data.alarme && data.alarme) {
+    // Só gera log se houve mudança real
+    if (status.alarme !== data.alarme) {
+      if (data.alarme) {
         addLog('Alarme disparado!', 'error');
         toast({
           title: "⚠️ Alarme Ativado",
           description: "Movimento detectado em modo alarme!",
           variant: "destructive"
         });
-      }
-
-      if (status.presenca !== data.presenca) {
-        addLog(data.presenca ? 'Presença detectada' : 'Área livre', data.presenca ? 'success' : 'warning');
-      }
-
-      if (status.modo !== data.modo) {
-        addLog(`Modo alterado para: ${data.modo}`, 'info');
-      }
-
-      setStatus(data);
-      setIsConnected(true);
-      setLastUpdate(new Date());
-    } catch (error) {
-      console.error('Erro ao buscar status:', error);
-      setIsConnected(false);
-      if (error instanceof Error) {
-        addLog(`Erro de conexão: ${error.message}`, 'error');
+      } else {
+        addLog('Alarme desativado', 'info');
       }
     }
-  }, [status, addLog, toast]);
 
-  // ✅ Alterar modo
+    if (status.presenca !== data.presenca) {
+      addLog(
+        data.presenca ? 'Presença detectada' : 'Área livre',
+        data.presenca ? 'success' : 'warning'
+      );
+    }
+
+    if (status.modo !== data.modo) {
+      addLog(`Modo alterado para: ${data.modo}`, 'info');
+    }
+
+    setStatus(data);
+    setIsConnected(true);
+    setLastUpdate(new Date());
+  } catch (error) {
+    console.error('Erro ao buscar status:', error);
+    setIsConnected(false);
+    if (error instanceof Error) {
+      addLog(`Erro de conexão: ${error.message}`, 'error');
+    }
+  }
+}, [status, addLog, toast]);
+
+
   const changeMode = useCallback(async (newMode: ArduinoStatus['modo']) => {
     try {
       const response = await fetch('http://localhost:3001/api/modo', {
@@ -111,7 +117,6 @@ export const useArduinoStatus = () => {
     }
   }, [addLog, fetchStatus, toast]);
 
-  // ✅ Desativar alarme manualmente
   const disableAlarm = useCallback(async () => {
     try {
       const response = await fetch('http://localhost:3001/api/desativar-alarme', { method: 'POST' });
@@ -137,9 +142,9 @@ export const useArduinoStatus = () => {
 
   useEffect(() => {
     fetchStatus();
-    const interval = setInterval(fetchStatus, 2000); // Polling a cada 2s
+    const interval = setInterval(fetchStatus, 2000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchStatus]);
 
   return {
     status,

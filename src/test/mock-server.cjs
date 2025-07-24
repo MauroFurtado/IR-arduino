@@ -1,4 +1,3 @@
-// mock-server.js
 const express = require('express');
 const cors = require('cors');
 const { SerialPort, ReadlineParser } = require('serialport');
@@ -7,7 +6,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ==== Estado do sistema ====
 let status = {
   presenca: false,
   alarme: false,
@@ -15,9 +13,8 @@ let status = {
   hora: new Date().toLocaleTimeString()
 };
 
-// ==== Configuração da porta serial ====
 const port = new SerialPort({
-  path: 'COM5', // Substitua pela porta correta no Windows ou /dev/ttyUSB0 no Linux
+  path: 'COM5', // Ajuste conforme sua porta
   baudRate: 9600
 });
 
@@ -36,7 +33,6 @@ parser.on('data', (data) => {
   }
 });
 
-// ==== Rotas ====
 app.get('/api/status', (req, res) => {
   res.json(status);
 });
@@ -45,7 +41,7 @@ app.post('/api/modo', (req, res) => {
   const { modo } = req.body;
   if (modo) {
     status.modo = modo;
-    port.write(`${modo}\n`); // Envia comando para Arduino
+    port.write(`${modo}\n`);
     console.log(`Modo alterado para: ${modo}`);
     res.json({ success: true, modo });
   } else {
@@ -55,12 +51,11 @@ app.post('/api/modo', (req, res) => {
 
 app.post('/api/desativar-alarme', (req, res) => {
   status.alarme = false;
-  port.write(`desligar\n`);
+  port.write(`desativar-alarme\n`);
   console.log('Alarme desativado via API');
   res.json({ success: true });
 });
 
-// ==== Inicializa servidor ====
 app.listen(3001, () => {
   console.log('Servidor rodando em http://localhost:3001');
 });
