@@ -9,7 +9,7 @@ Este projeto é um sistema de monitoramento em tempo real para Arduino, com inte
 - Controle de modos: desligado, casa, alarme
 - Alarme sonoro e visual (buzzer e LEDs)
 - Log de eventos e status em tempo real
-- Comunicação entre Arduino e servidor via Serial + API REST
+- Comunicação entre Arduino e servidor via Serial + API 
 
 ## Estrutura
 
